@@ -93,10 +93,16 @@ public class SqlSessionFactoryBean
   private static final ResourcePatternResolver RESOURCE_PATTERN_RESOLVER = new PathMatchingResourcePatternResolver();
   private static final MetadataReaderFactory METADATA_READER_FACTORY = new CachingMetadataReaderFactory();
 
+  /**
+   * 指定 mybatis-config.xml 路径的 Resource 对象
+   */
   private Resource configLocation;
 
   private Configuration configuration;
 
+  /**
+   * 指定 Mapper 路径的 Resource 数组
+   */
   private Resource[] mapperLocations;
 
   private DataSource dataSource;
