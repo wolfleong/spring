@@ -53,8 +53,14 @@ import org.springframework.beans.factory.FactoryBean;
  */
 public class MapperFactoryBean<T> extends SqlSessionDaoSupport implements FactoryBean<T> {
 
+  /**
+   * Mapper 接口
+   */
   private Class<T> mapperInterface;
 
+  /**
+   * 是否添加到 Configuration 中
+   */
   private boolean addToConfig = true;
 
   public MapperFactoryBean() {
@@ -70,13 +76,18 @@ public class MapperFactoryBean<T> extends SqlSessionDaoSupport implements Factor
    */
   @Override
   protected void checkDaoConfig() {
+    //校验 sqlSessionTemplate 非空
     super.checkDaoConfig();
 
+    //校验 mapperInterface 非空
     notNull(this.mapperInterface, "Property 'mapperInterface' is required");
 
+    //添加 Mapper 接口到 configuration 中
     Configuration configuration = getSqlSession().getConfiguration();
+    //addToConfig 为 true 且配置还没有加载这个 Mapper
     if (this.addToConfig && !configuration.hasMapper(this.mapperInterface)) {
       try {
+        //添加到 Mapper 中
         configuration.addMapper(this.mapperInterface);
       } catch (Exception e) {
         logger.error("Error while adding the mapper '" + this.mapperInterface + "' to configuration.", e);
@@ -92,6 +103,7 @@ public class MapperFactoryBean<T> extends SqlSessionDaoSupport implements Factor
    */
   @Override
   public T getObject() throws Exception {
+    //获取 Mapper 的代理实例
     return getSqlSession().getMapper(this.mapperInterface);
   }
 
@@ -100,6 +112,7 @@ public class MapperFactoryBean<T> extends SqlSessionDaoSupport implements Factor
    */
   @Override
   public Class<T> getObjectType() {
+    //获取代理对象类型
     return this.mapperInterface;
   }
 
