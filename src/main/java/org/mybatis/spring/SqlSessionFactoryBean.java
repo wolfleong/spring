@@ -68,6 +68,8 @@ import static org.springframework.util.StringUtils.hasLength;
 import static org.springframework.util.StringUtils.tokenizeToStringArray;
 
 /**
+ * 实现 FactoryBean、InitializingBean、ApplicationListener 接口，负责创建 SqlSessionFactory 对象
+ *
  * {@code FactoryBean} that creates a MyBatis {@code SqlSessionFactory}. This is the usual way to set up a shared
  * MyBatis {@code SqlSessionFactory} in a Spring application context; the SqlSessionFactory can then be passed to
  * MyBatis-based DAOs via dependency injection.
@@ -478,7 +480,7 @@ public class SqlSessionFactoryBean
     state((configuration == null && configLocation == null) || !(configuration != null && configLocation != null),
         "Property 'configuration' and 'configLocation' can not specified with together");
 
-    //创建 SqlSession 对象
+    // 创建 SqlSessionFactory 对象
     this.sqlSessionFactory = buildSqlSessionFactory();
   }
 
@@ -613,7 +615,7 @@ public class SqlSessionFactoryBean
       }
     }
 
-    //设置 Environment
+    //设置 Environment, 并且设置事务工厂
     targetConfiguration.setEnvironment(new Environment(this.environment,
         this.transactionFactory == null ? new SpringManagedTransactionFactory() : this.transactionFactory,
         this.dataSource));

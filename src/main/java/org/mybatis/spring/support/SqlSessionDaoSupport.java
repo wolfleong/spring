@@ -23,12 +23,13 @@ import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.dao.support.DaoSupport;
 
 /**
+ * 继承 DaoSupport 抽象类，SqlSession 的 DaoSupport 抽象类
  * Convenient super class for MyBatis SqlSession data access objects. It gives you access to the template which can then
  * be used to execute SQL methods.
  * <p>
  * This class needs a SqlSessionTemplate or a SqlSessionFactory. If both are set the SqlSessionFactory will be ignored.
  * <p>
- * 
+ *
  * @author Putthiphong Boonphong
  * @author Eduardo Macarron
  *
@@ -38,6 +39,9 @@ import org.springframework.dao.support.DaoSupport;
  */
 public abstract class SqlSessionDaoSupport extends DaoSupport {
 
+  /**
+   * SqlSessionTemplate 对象
+   */
   private SqlSessionTemplate sqlSessionTemplate;
 
   /**
@@ -59,7 +63,7 @@ public abstract class SqlSessionDaoSupport extends DaoSupport {
    * <p>
    * Can be overridden in subclasses to provide a SqlSessionTemplate instance with different configuration, or a custom
    * SqlSessionTemplate subclass.
-   * 
+   *
    * @param sqlSessionFactory
    *          the MyBatis SqlSessionFactory to create a SqlSessionTemplate for
    * @return the new SqlSessionTemplate instance

@@ -24,6 +24,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 多 @MapperScan 的注解，功能是相同的
+ *
  * The Container annotation that aggregates several {@link MapperScan} annotations.
  *
  * <p>

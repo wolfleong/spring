@@ -42,6 +42,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.util.StringUtils;
 
 /**
+ * 实现 BeanDefinitionRegistryPostProcessor、InitializingBean、ApplicationContextAware、BeanNameAware 接口，定义需要扫描的包，
+ * 将包中符合的 Mapper 接口，注册成 beanClass 为 MapperFactoryBean 的 BeanDefinition 对象，从而实现创建 Mapper 对象。
+ *
  * BeanDefinitionRegistryPostProcessor that searches recursively starting from a base package for interfaces and
  * registers them as {@code MapperFactoryBean}. Note that only interfaces with at least one method will be registered;
  * concrete classes will be ignored.
@@ -191,7 +194,7 @@ public class MapperScannerConfigurer
    * Specifies which {@code SqlSessionTemplate} to use in the case that there is more than one in the spring context.
    * Usually this is only needed when you have more than one datasource.
    * <p>
-   * 
+   *
    * @deprecated Use {@link #setSqlSessionTemplateBeanName(String)} instead
    *
    * @param sqlSessionTemplate
@@ -222,7 +225,7 @@ public class MapperScannerConfigurer
    * Specifies which {@code SqlSessionFactory} to use in the case that there is more than one in the spring context.
    * Usually this is only needed when you have more than one datasource.
    * <p>
-   * 
+   *
    * @deprecated Use {@link #setSqlSessionFactoryBeanName(String)} instead.
    *
    * @param sqlSessionFactory
@@ -253,7 +256,7 @@ public class MapperScannerConfigurer
    * Specifies a flag that whether execute a property placeholder processing or not.
    * <p>
    * The default is {@literal false}. This means that a property placeholder processing does not execute.
-   * 
+   *
    * @since 1.1.1
    *
    * @param processPropertyPlaceHolders
@@ -329,15 +332,17 @@ public class MapperScannerConfigurer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @since 1.0.2
    */
   @Override
   public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) {
+    //如果有属性占位符，则进行获得，例如 ${basePackage} 等等
     if (this.processPropertyPlaceHolders) {
       processPropertyPlaceHolders();
     }
 
+    //创建 ClassPathMapperScanner 对象，并设置其相关属性
     ClassPathMapperScanner scanner = new ClassPathMapperScanner(registry);
     scanner.setAddToConfig(this.addToConfig);
     scanner.setAnnotationClass(this.annotationClass);
@@ -352,7 +357,9 @@ public class MapperScannerConfigurer
     if (StringUtils.hasText(lazyInitialization)) {
       scanner.setLazyInitialization(Boolean.valueOf(lazyInitialization));
     }
+    // 注册 scanner 过滤器
     scanner.registerFilters();
+    // 执行扫描
     scanner.scan(
         StringUtils.tokenizeToStringArray(this.basePackage, ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS));
   }
@@ -364,8 +371,10 @@ public class MapperScannerConfigurer
    * definition. Then update the values.
    */
   private void processPropertyPlaceHolders() {
+    //获取所有属性替换的配置类
     Map<String, PropertyResourceConfigurer> prcs = applicationContext.getBeansOfType(PropertyResourceConfigurer.class);
 
+    //配置文件替换
     if (!prcs.isEmpty() && applicationContext instanceof ConfigurableApplicationContext) {
       BeanDefinition mapperScannerBean = ((ConfigurableApplicationContext) applicationContext).getBeanFactory()
           .getBeanDefinition(beanName);
@@ -387,6 +396,7 @@ public class MapperScannerConfigurer
       this.sqlSessionTemplateBeanName = updatePropertyValue("sqlSessionTemplateBeanName", values);
       this.lazyInitialization = updatePropertyValue("lazyInitialization", values);
     }
+    //环境变量替换
     this.basePackage = Optional.ofNullable(this.basePackage).map(getEnvironment()::resolvePlaceholders).orElse(null);
     this.sqlSessionFactoryBeanName = Optional.ofNullable(this.sqlSessionFactoryBeanName)
         .map(getEnvironment()::resolvePlaceholders).orElse(null);
@@ -400,6 +410,9 @@ public class MapperScannerConfigurer
     return this.applicationContext.getEnvironment();
   }
 
+  /**
+   * 获得属性值，并转换成 String 类型
+   */
   private String updatePropertyValue(String propertyName, PropertyValues values) {
     PropertyValue property = values.getPropertyValue(propertyName);
 
