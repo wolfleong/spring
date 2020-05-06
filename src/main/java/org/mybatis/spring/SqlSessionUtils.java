@@ -322,7 +322,7 @@ public final class SqlSessionUtils {
       if (TransactionSynchronizationManager.isActualTransactionActive()) {
         try {
           LOGGER.debug(() -> "Transaction synchronization committing SqlSession [" + this.holder.getSqlSession() + "]");
-          // 提交事务
+          // 提交事务, 这里的提交事务只是为了刷新 SqlSession / Executor 的缓存, 低层的 SpringManagedTransaction 是没有任务操作的
           this.holder.getSqlSession().commit();
         } catch (PersistenceException p) {
           // 如果发生异常，则进行转换，并抛出异常
